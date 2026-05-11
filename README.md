@@ -2,7 +2,7 @@
 
 A personal financial statement builder — balance sheet, income statement, and cash flow in one place. No signup, no backend, data stays in your browser.
 
-![Screenshot placeholder](./screenshot.png)
+![MyNetWorth — balance sheet, income statement and cash flow in one view](./screenshot.png)
 
 ## Features
 
