@@ -13,6 +13,7 @@ export const SUPPORTED_CURRENCIES: CurrencyInfo[] = [
   { code: 'AED', name: 'UAE Dirham',         symbol: 'د.إ'  },
   { code: 'HKD', name: 'Hong Kong Dollar',   symbol: 'HK$'  },
   { code: 'MXN', name: 'Mexican Peso',       symbol: 'MX$'  },
+  { code: 'THB', name: 'Thai Baht',          symbol: '฿'    },
 ]
 
 // Default rates relative to USD (1 unit of currency = N USD)
@@ -28,6 +29,7 @@ export const DEFAULT_EXCHANGE_RATES: Record<string, number> = {
   AED: 0.27,
   HKD: 0.13,
   MXN: 0.052,
+  THB: 0.028,
 }
 
 export function getCurrencyInfo(code: string): CurrencyInfo {
@@ -68,7 +70,7 @@ export function rebaseRates(
 const CURRENCY_LOCALES: Record<string, string> = {
   USD: 'en-US', EUR: 'de-DE', GBP: 'en-GB', INR: 'en-IN',
   AUD: 'en-AU', CAD: 'en-CA', JPY: 'ja-JP', CHF: 'de-CH',
-  SGD: 'en-SG', AED: 'ar-AE', HKD: 'zh-HK', MXN: 'es-MX',
+  SGD: 'en-SG', AED: 'ar-AE', HKD: 'zh-HK', MXN: 'es-MX', THB: 'th-TH',
 }
 
 const formatterCache = new Map<string, Intl.NumberFormat>()
