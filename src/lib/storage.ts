@@ -1,7 +1,9 @@
 import type { FinancialData } from './types'
-import { DEFAULT_DATA } from './defaults'
+import { DEFAULT_DATA, } from './defaults'
+import { DEFAULT_EXCHANGE_RATES } from './utils'
 
 const KEY = 'mynetworth_v1'
+const MAX_IMPORT_BYTES = 512 * 1024
 
 export function loadData(): FinancialData {
   if (typeof window === 'undefined') return DEFAULT_DATA
@@ -9,8 +11,21 @@ export function loadData(): FinancialData {
     const raw = localStorage.getItem(KEY)
     if (!raw) return structuredClone(DEFAULT_DATA)
     const parsed = JSON.parse(raw) as Partial<FinancialData>
-    // Merge with defaults so newly added fields always exist
-    return { ...structuredClone(DEFAULT_DATA), ...parsed }
+    const data: FinancialData = { ...structuredClone(DEFAULT_DATA), ...parsed }
+    // Migration: ensure every line item has a currency field
+    const base = data.currency
+    const migrate = <T extends { currency?: string }>(items: T[]): T[] =>
+      items.map((item) => ({ ...item, currency: item.currency ?? base }))
+    data.assets      = migrate(data.assets)
+    data.liabilities = migrate(data.liabilities)
+    data.income      = migrate(data.income)
+    data.expenses    = migrate(data.expenses)
+    data.cashFlows   = migrate(data.cashFlows)
+    // Migration: ensure exchangeRates exists
+    if (!data.exchangeRates || typeof data.exchangeRates !== 'object') {
+      data.exchangeRates = { ...DEFAULT_EXCHANGE_RATES }
+    }
+    return data
   } catch {
     return structuredClone(DEFAULT_DATA)
   }
@@ -40,8 +55,6 @@ export function exportJSON(data: FinancialData): void {
   URL.revokeObjectURL(url)
 }
 
-const MAX_IMPORT_BYTES = 512 * 1024 // 512 KB — more than enough for any real statement
-
 export function importJSON(file: File): Promise<FinancialData> {
   if (file.size > MAX_IMPORT_BYTES) {
     return Promise.reject(new Error('File is too large to be a valid backup (max 512 KB)'))
@@ -54,7 +67,16 @@ export function importJSON(file: File): Promise<FinancialData> {
         if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
           throw new Error('Invalid shape')
         }
-        resolve({ ...structuredClone(DEFAULT_DATA), ...parsed })
+        const data: FinancialData = { ...structuredClone(DEFAULT_DATA), ...parsed }
+        const base = data.currency
+        const migrate = <T extends { currency?: string }>(items: T[]): T[] =>
+          items.map((item) => ({ ...item, currency: item.currency ?? base }))
+        data.assets      = migrate(data.assets)
+        data.liabilities = migrate(data.liabilities)
+        data.income      = migrate(data.income)
+        data.expenses    = migrate(data.expenses)
+        data.cashFlows   = migrate(data.cashFlows)
+        resolve(data)
       } catch {
         reject(new Error('Invalid JSON file'))
       }

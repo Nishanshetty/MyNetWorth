@@ -7,7 +7,7 @@ import {
   RotateCcw,
   Download,
   Upload,
-  DollarSign,
+  Settings2,
   BarChart2,
 } from 'lucide-react'
 
@@ -17,12 +17,11 @@ import IncomeStatementTab from '@/components/IncomeStatementTab'
 import CashFlowTab from '@/components/CashFlowTab'
 import StatementPreviewTab from '@/components/StatementPreviewTab'
 
-import type { FinancialData, Tab, Currency } from '@/lib/types'
+import CurrencySettingsModal from '@/components/CurrencySettingsModal'
+import type { FinancialData, Tab } from '@/lib/types'
 import { calculateMetrics } from '@/lib/calculations'
 import { loadData, saveData, clearData, exportJSON, importJSON } from '@/lib/storage'
 import { DEFAULT_DATA } from '@/lib/defaults'
-
-const CURRENCIES: Currency[] = ['USD', 'EUR', 'GBP', 'INR']
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'balance-sheet', label: 'Balance sheet' },
@@ -35,6 +34,7 @@ export default function Home() {
   const [data, setData] = useState<FinancialData>(DEFAULT_DATA)
   const [activeTab, setActiveTab] = useState<Tab>('balance-sheet')
   const [showResetDialog, setShowResetDialog] = useState(false)
+  const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [mounted, setMounted] = useState(false)
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const importRef = useRef<HTMLInputElement>(null)
@@ -116,22 +116,15 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Currency selector */}
-            <div className="flex items-center gap-1 rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 dark:border-gray-700 dark:bg-gray-800">
-              <DollarSign size={12} className="text-gray-400" />
-              <select
-                value={data.currency}
-                onChange={(e) => update({ currency: e.target.value as Currency })}
-                className="bg-transparent text-xs text-gray-600 focus:outline-none dark:text-gray-400"
-                aria-label="Currency"
-              >
-                {CURRENCIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {/* Currency badge — opens settings modal */}
+            <button
+              onClick={() => setShowCurrencyModal(true)}
+              title="Currency settings"
+              className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:border-gray-300 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:border-gray-600 dark:hover:bg-gray-700"
+            >
+              <Settings2 size={11} className="text-gray-400" />
+              {data.currency}
+            </button>
 
             {/* Name input */}
             <input
@@ -248,6 +241,15 @@ export default function Home() {
           </p>
         </footer>
       </main>
+
+      {/* Currency settings modal */}
+      {showCurrencyModal && (
+        <CurrencySettingsModal
+          data={data}
+          onClose={() => setShowCurrencyModal(false)}
+          onChange={update}
+        />
+      )}
 
       {/* Reset confirmation dialog */}
       {showResetDialog && (

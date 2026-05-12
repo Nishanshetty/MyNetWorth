@@ -25,7 +25,7 @@ export default function BalanceSheetTab({ data, metrics, onChange }: Props) {
         items={data.assets}
         total={metrics.totalAssets}
         totalLabel="Total assets"
-        currency={data.currency}
+        baseCurrency={data.currency}
         accentColor="green"
         onChange={(assets) => onChange({ assets })}
       />
@@ -34,7 +34,7 @@ export default function BalanceSheetTab({ data, metrics, onChange }: Props) {
         items={data.liabilities}
         total={metrics.totalLiabilities}
         totalLabel="Total liabilities"
-        currency={data.currency}
+        baseCurrency={data.currency}
         accentColor="red"
         onChange={(liabilities) => onChange({ liabilities })}
       />

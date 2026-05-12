@@ -25,7 +25,7 @@ export default function IncomeStatementTab({ data, metrics, onChange }: Props) {
         items={data.income}
         total={metrics.totalIncome}
         totalLabel="Total income"
-        currency={data.currency}
+        baseCurrency={data.currency}
         accentColor="green"
         onChange={(income) => onChange({ income })}
       />
@@ -34,7 +34,7 @@ export default function IncomeStatementTab({ data, metrics, onChange }: Props) {
         items={data.expenses}
         total={metrics.totalExpenses}
         totalLabel="Total expenses"
-        currency={data.currency}
+        baseCurrency={data.currency}
         accentColor="red"
         onChange={(expenses) => onChange({ expenses })}
       />

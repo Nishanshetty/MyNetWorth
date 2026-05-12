@@ -2,15 +2,8 @@
 
 import { Plus } from 'lucide-react'
 import CashFlowRow from './CashFlowRow'
-import type { FinancialData, Metrics, CashFlowItem, Currency } from '@/lib/types'
+import type { FinancialData, Metrics, CashFlowItem } from '@/lib/types'
 import { formatCurrency, uid } from '@/lib/utils'
-
-const CURRENCY_SYMBOLS: Record<Currency, string> = {
-  USD: '$',
-  EUR: '€',
-  GBP: '£',
-  INR: '₹',
-}
 
 interface Props {
   data: FinancialData
@@ -19,9 +12,9 @@ interface Props {
 }
 
 export default function CashFlowTab({ data, metrics, onChange }: Props) {
-  const symbol = CURRENCY_SYMBOLS[data.currency]
+  const base = data.currency
 
-  function handleChange(id: string, field: 'type' | 'label' | 'amount', value: string | number) {
+  function handleChange(id: string, field: 'type' | 'label' | 'amount' | 'currency', value: string | number) {
     onChange({
       cashFlows: data.cashFlows.map((item) =>
         item.id === id ? { ...item, [field]: value } : item,
@@ -35,7 +28,7 @@ export default function CashFlowTab({ data, metrics, onChange }: Props) {
 
   function handleAdd(type: CashFlowItem['type']) {
     onChange({
-      cashFlows: [...data.cashFlows, { id: uid(), type, label: '', amount: 0 }],
+      cashFlows: [...data.cashFlows, { id: uid(), type, label: '', amount: 0, currency: base }],
     })
   }
 
@@ -58,9 +51,9 @@ export default function CashFlowTab({ data, metrics, onChange }: Props) {
             <CashFlowRow
               key={item.id}
               item={item}
+              baseCurrency={base}
               onChange={handleChange}
               onDelete={handleDelete}
-              currencySymbol={symbol}
             />
           ))}
         </div>
@@ -89,8 +82,11 @@ export default function CashFlowTab({ data, metrics, onChange }: Props) {
               {formatCurrency(
                 data.cashFlows
                   .filter((r) => r.type === 'inflow')
-                  .reduce((s, r) => s + r.amount, 0),
-                data.currency,
+                  .reduce((s, r) => {
+                    const rate = r.currency === base ? 1 : (data.exchangeRates[r.currency] ?? 1)
+                    return s + r.amount * rate
+                  }, 0),
+                base,
               )}
             </span>
           </div>
@@ -100,8 +96,11 @@ export default function CashFlowTab({ data, metrics, onChange }: Props) {
               {formatCurrency(
                 data.cashFlows
                   .filter((r) => r.type === 'outflow')
-                  .reduce((s, r) => s + r.amount, 0),
-                data.currency,
+                  .reduce((s, r) => {
+                    const rate = r.currency === base ? 1 : (data.exchangeRates[r.currency] ?? 1)
+                    return s + r.amount * rate
+                  }, 0),
+                base,
               )}
             </span>
           </div>
@@ -111,7 +110,7 @@ export default function CashFlowTab({ data, metrics, onChange }: Props) {
       <div className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-5 py-4 dark:border-gray-700 dark:bg-gray-800">
         <span className="font-semibold text-gray-700 dark:text-gray-200">Net cash flow</span>
         <span className={`text-lg font-bold tabular-nums ${netColor}`}>
-          {formatCurrency(metrics.netCashFlow, data.currency)}
+          {formatCurrency(metrics.netCashFlow, base)}
         </span>
       </div>
     </div>

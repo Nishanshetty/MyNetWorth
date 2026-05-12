@@ -2,22 +2,15 @@
 
 import { Plus } from 'lucide-react'
 import EditableRow from './EditableRow'
-import type { LineItem, Currency } from '@/lib/types'
+import type { LineItem } from '@/lib/types'
 import { formatCurrency, uid } from '@/lib/utils'
-
-const CURRENCY_SYMBOLS: Record<Currency, string> = {
-  USD: '$',
-  EUR: '€',
-  GBP: '£',
-  INR: '₹',
-}
 
 interface Props {
   title: string
   items: LineItem[]
-  total: number
+  total: number            // already converted to base currency
   totalLabel: string
-  currency: Currency
+  baseCurrency: string
   accentColor?: 'green' | 'red' | 'blue'
   onChange: (items: LineItem[]) => void
 }
@@ -27,13 +20,11 @@ export default function SectionCard({
   items,
   total,
   totalLabel,
-  currency,
+  baseCurrency,
   accentColor = 'blue',
   onChange,
 }: Props) {
-  const symbol = CURRENCY_SYMBOLS[currency]
-
-  function handleChange(id: string, field: 'label' | 'amount', value: string | number) {
+  function handleChange(id: string, field: 'label' | 'amount' | 'currency', value: string | number) {
     onChange(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
   }
 
@@ -42,13 +33,13 @@ export default function SectionCard({
   }
 
   function handleAdd() {
-    onChange([...items, { id: uid(), label: '', amount: 0 }])
+    onChange([...items, { id: uid(), label: '', amount: 0, currency: baseCurrency }])
   }
 
   const accentMap = {
     green: 'text-emerald-600 dark:text-emerald-400',
-    red: 'text-red-500 dark:text-red-400',
-    blue: 'text-blue-600 dark:text-blue-400',
+    red:   'text-red-500 dark:text-red-400',
+    blue:  'text-blue-600 dark:text-blue-400',
   }
 
   return (
@@ -62,9 +53,9 @@ export default function SectionCard({
           <EditableRow
             key={item.id}
             item={item}
+            baseCurrency={baseCurrency}
             onChange={handleChange}
             onDelete={handleDelete}
-            currencySymbol={symbol}
           />
         ))}
       </div>
@@ -80,7 +71,7 @@ export default function SectionCard({
       <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
         <span className="text-sm font-medium text-gray-600 dark:text-gray-400">{totalLabel}</span>
         <span className={`text-sm font-semibold tabular-nums ${accentMap[accentColor]}`}>
-          {formatCurrency(total, currency)}
+          {formatCurrency(total, baseCurrency)}
         </span>
       </div>
     </div>
