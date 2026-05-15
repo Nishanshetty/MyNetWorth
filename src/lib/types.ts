@@ -1,7 +1,7 @@
 // Currency is now a plain string (any ISO 4217 code) for flexibility
 export type Currency = string
 
-export type Tab = 'balance-sheet' | 'income' | 'cash-flow' | 'preview'
+export type Tab = 'balance-sheet' | 'income' | 'cash-flow' | 'calculator' | 'preview'
 
 export interface CurrencyInfo {
   code: string
@@ -37,6 +37,7 @@ export interface FinancialData {
   income: LineItem[]
   expenses: LineItem[]
   cashFlows: CashFlowItem[]
+  calculator: import('./calculator').CalculatorState
 }
 
 export interface Metrics {

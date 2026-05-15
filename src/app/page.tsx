@@ -16,6 +16,7 @@ import BalanceSheetTab from '@/components/BalanceSheetTab'
 import IncomeStatementTab from '@/components/IncomeStatementTab'
 import CashFlowTab from '@/components/CashFlowTab'
 import StatementPreviewTab from '@/components/StatementPreviewTab'
+import CompoundCalculatorTab from '@/components/CompoundCalculatorTab'
 
 import CurrencySettingsModal from '@/components/CurrencySettingsModal'
 import type { FinancialData, Tab } from '@/lib/types'
@@ -25,9 +26,10 @@ import { DEFAULT_DATA } from '@/lib/defaults'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'balance-sheet', label: 'Balance sheet' },
-  { id: 'income', label: 'Income statement' },
-  { id: 'cash-flow', label: 'Cash flow' },
-  { id: 'preview', label: 'Preview & print' },
+  { id: 'income',        label: 'Income statement' },
+  { id: 'cash-flow',     label: 'Cash flow' },
+  { id: 'calculator',    label: 'Calculator' },
+  { id: 'preview',       label: 'Preview & print' },
 ]
 
 export default function Home() {
@@ -193,12 +195,12 @@ export default function Home() {
         </section>
 
         {/* Tab navigation */}
-        <nav className="no-print mb-4 flex gap-1 rounded-xl border border-gray-200 bg-white p-1 dark:border-gray-700 dark:bg-gray-900">
+        <nav className="no-print mb-4 flex gap-1 overflow-x-auto rounded-xl border border-gray-200 bg-white p-1 dark:border-gray-700 dark:bg-gray-900">
           {TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                 activeTab === tab.id
                   ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
                   : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'
@@ -219,6 +221,9 @@ export default function Home() {
           )}
           {activeTab === 'cash-flow' && (
             <CashFlowTab data={data} metrics={metrics} onChange={update} />
+          )}
+          {activeTab === 'calculator' && (
+            <CompoundCalculatorTab data={data} onChange={update} />
           )}
           {activeTab === 'preview' && (
             <StatementPreviewTab data={data} metrics={metrics} />

@@ -1,5 +1,6 @@
 import type { FinancialData } from './types'
 import { DEFAULT_EXCHANGE_RATES } from './utils'
+import { DEFAULT_CALC_STATE } from './calculator'
 
 function id() {
   return Math.random().toString(36).slice(2, 10)
@@ -42,4 +43,5 @@ export const DEFAULT_DATA: FinancialData = {
     { id: id(), type: 'inflow',  label: 'Tax refund',               amount: 0, currency: 'USD' },
     { id: id(), type: 'outflow', label: 'Annual insurance premium',  amount: 0, currency: 'USD' },
   ],
+  calculator: { ...DEFAULT_CALC_STATE },
 }
